@@ -81,6 +81,40 @@ GameManager.prototype.addRandomTile = function () {
   }
 };
 
+// Add bonus tile
+GameManager.prototype.addBonus = function () {
+  if (Math.random() > 0.2 * this.grid.availableCells().length / Math.pow(this.size, 3)) {
+    return;
+  }
+  var maxBonus = 0;
+  var values = [4, 64, 256];
+  var value = values[Math.floor(Math.random() * values.length)];
+  if (this.bonus[value] === undefined) {
+    this.bonus[value] = 0;
+  }
+  if (this.bonus[value] == 2) {
+    return;
+  }
+  for (var num in this.bonus) {
+    maxBonus -= this.bonus[num];
+  }
+  if (maxBonus <= 0) {
+    return;
+  }
+  if (this.grid.cellsAvailable()) {
+    this.bonus[value]++;
+    var tile = new Tile(this.grid.randomAvailableCell(), value, 'bonus');
+    this.grid.insertTile(tile);
+  }
+};
+
+// remove bonus tile
+GameManager.prototype.removeBonus = function (value) {
+  if (this.bonus[value] !== undefined) {
+    delete this.bonus[value];
+  }
+};
+
 // Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
   if (this.scoreManager.get() < this.score) {
