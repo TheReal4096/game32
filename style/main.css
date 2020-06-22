@@ -575,6 +575,13 @@ hr {
   background: #776e65;
   color: #eee4da;
 }
+.tile.tile-1 .cube-face {
+  background: #eaeaea;
+}
+.tile.tile-bonus.tile-1 .cube-face {
+  background: #776e65;
+  color: #eaeaea;
+}
 .tile.tile-2 .cube-face {
   background: #eee4da;
 }
