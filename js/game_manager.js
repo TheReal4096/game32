@@ -74,44 +74,10 @@ GameManager.prototype.addStartTiles = function () {
 // Adds a tile in a random position
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
-    var value = Math.random() < 0.9 ? 2 : 4;
+    var value = (Math.random() < 0.75 ? 1 : (Math.random() < 0.75 ? 2 : 4) );
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
-  }
-};
-
-// Add bonus tile
-GameManager.prototype.addBonus = function () {
-  if (Math.random() > 0.2 * this.grid.availableCells().length / Math.pow(this.size, 3)) {
-    return;
-  }
-  var maxBonus = 4;
-  var values = [4, 64, 256];
-  var value = values[Math.floor(Math.random() * values.length)];
-  if (this.bonus[value] === undefined) {
-    this.bonus[value] = 0;
-  }
-  if (this.bonus[value] == 2) {
-    return;
-  }
-  for (var num in this.bonus) {
-    maxBonus -= this.bonus[num];
-  }
-  if (maxBonus <= 0) {
-    return;
-  }
-  if (this.grid.cellsAvailable()) {
-    this.bonus[value]++;
-    var tile = new Tile(this.grid.randomAvailableCell(), value, 'bonus');
-    this.grid.insertTile(tile);
-  }
-};
-
-// remove bonus tile
-GameManager.prototype.removeBonus = function (value) {
-  if (this.bonus[value] !== undefined) {
-    delete this.bonus[value];
   }
 };
 
@@ -200,7 +166,7 @@ GameManager.prototype.move = function (direction) {
               self.max = merged.value;
             }
             // The mighty 2048 tile
-            if (merged.value === 2048 && merged.type === 'number') self.won = true;
+            if (merged.value === 16384 && merged.type === 'number') self.won = true;
           } else {
             self.moveTile(tile, positions.farthest);
           }
