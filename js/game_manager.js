@@ -54,7 +54,6 @@ GameManager.prototype.setup = function () {
   this.over        = false;
   this.won         = false;
   this.keepPlaying = false;
-  this.bonus       = {};
   this.max         = 2;
 
   // Add the initial tiles
@@ -78,40 +77,6 @@ GameManager.prototype.addRandomTile = function () {
     var tile = new Tile(this.grid.randomAvailableCell(), value);
 
     this.grid.insertTile(tile);
-  }
-};
-
-// Add bonus tile
-GameManager.prototype.addBonus = function () {
-  if (Math.random() > 0.2 * this.grid.availableCells().length / Math.pow(this.size, 3)) {
-    return;
-  }
-  var maxBonus = 0;
-  var values = [4, 64, 256];
-  var value = values[Math.floor(Math.random() * values.length)];
-  if (this.bonus[value] === undefined) {
-    this.bonus[value] = 0;
-  }
-  if (this.bonus[value] == 2) {
-    return;
-  }
-  for (var num in this.bonus) {
-    maxBonus -= this.bonus[num];
-  }
-  if (maxBonus <= 0) {
-    return;
-  }
-  if (this.grid.cellsAvailable()) {
-    this.bonus[value]++;
-    var tile = new Tile(this.grid.randomAvailableCell(), value, 'bonus');
-    this.grid.insertTile(tile);
-  }
-};
-
-// remove bonus tile
-GameManager.prototype.removeBonus = function (value) {
-  if (this.bonus[value] !== undefined) {
-    delete this.bonus[value];
   }
 };
 
@@ -180,15 +145,13 @@ GameManager.prototype.move = function (direction) {
 
           // Only one merger per row traversal?
           if (next && next.value === tile.value && next.type === tile.type && !next.mergedFrom) {
-            var type = next.type === 'number' ? 'number' : 'bonused';
-            var merged = new Tile(positions.next, tile.value * 2, type);
+            var type = next.type === 'number' ? 'number';
+            var merged = new Tile(positions.next, tile.value + 1, type);
             merged.mergedFrom = [tile, next];
             tile.merged = next.merged = true;
 
             self.grid.insertTile(merged);
             self.grid.removeTile(tile);
-            if (tile.type === 'bonus') {
-              self.removeBonus(tile.value);
             }
 
             // Converge the two tiles' positions
@@ -200,7 +163,7 @@ GameManager.prototype.move = function (direction) {
               self.max = merged.value;
             }
             // The mighty 2048 tile
-            if (merged.value === 16384 && merged.type === 'number') self.won = true;
+            if (merged.value === 14 && merged.type === 'number') self.won = true;
           } else {
             self.moveTile(tile, positions.farthest);
           }
@@ -215,7 +178,6 @@ GameManager.prototype.move = function (direction) {
 
   if (moved) {
     this.addRandomTile();
-    this.addBonus();
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
